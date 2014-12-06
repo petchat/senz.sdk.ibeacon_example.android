@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import com.senz.core.Senz;
+import com.senz.service.DeviceInfo;
 import com.senz.service.SenzService;
 import com.senz.exception.SenzException;
 import com.senz.utils.L;
@@ -76,10 +77,12 @@ public class SenzManager {
     private ServiceConnection mServiceConnection;
 
     private boolean mStarted;
-    private HashMap<Senz, Long> mLastSeen = new HashMap<Senz, Long>();
-    private Filter mFilter = new Filter(this.mContext);
+
+    private StaticInfo staticInfo = null;
+    //private HashMap<Senz, Long> mLastSeen = new HashMap<Senz, Long>();
+    //private Filter mFilter = new Filter(this.mContext);
     // It stores senz info
-    private ArrayList<Senz> mLastDiscovered;
+    //private ArrayList<Senz> mLastDiscovered;
 
     public SenzManager(Context context) {
         this.mContext = context;
@@ -88,7 +91,7 @@ public class SenzManager {
         // Instantiate the Messenger that used to get message from SenzService
         this.mIncomingMessenger = new Messenger(new IncomingHandler());
 
-        this.mLastDiscovered = new ArrayList<Senz>();
+        //this.mLastDiscovered = new ArrayList<Senz>();
     }
 
     public boolean checkPermissions() {
@@ -230,7 +233,7 @@ public class SenzManager {
 
     private void respondSenz(final ArrayList<Senz> senzes) {
         L.i("[SenzManager] Senzes Discovered count:" + senzes.size());
-        this.mLastDiscovered = senzes;
+        //this.mLastDiscovered = senzes;
         // If there is senz
         if(senzes.size() > 1) {
             senzes.remove(senzes.size() - 1);
@@ -248,6 +251,12 @@ public class SenzManager {
                 this.mTelepathyCallback.discoverTOI(toi);
             }
         }
+    }
+
+    private void respondStaticInfo(final StaticInfo staticInfo) {
+        //if() {
+            this.mTelepathyCallback.discoverStaticInfo(staticInfo);
+        //}
     }
 
     private void respondError(String reason) {
@@ -277,7 +286,7 @@ public class SenzManager {
                     break;
                 case SenzService.MSG_STATICINFO_RESPONSE:
                     StaticInfo staticInfo = msg.getData().getParcelable("staticinfo");
-                    L.i("User's gender is " + staticInfo.getGender());
+                    SenzManager.this.respondStaticInfo(staticInfo);
                     break;
                 case SenzService.MSG_ERROR_RESPONSE:
                     String reason = msg.getData().getString("reason");
@@ -327,34 +336,10 @@ public class SenzManager {
         public void dicoverSenz(List<Senz> senzes);
         public void discoverPOI(POI poi);
         public void discoverTOI(TOI toi);
+        public void discoverStaticInfo(StaticInfo staticInfo);
     }
 
     public interface ErrorHandler {
         public void onError(SenzException e);
     }
-
-    // Log the senzes and report the unseen senzes.
-    /*private void reportUnseenAndUpdateTime(ArrayList<Senz> senzes) {
-        // Get current time
-        long now = System.currentTimeMillis();
-        ArrayList<Senz> unseens = new ArrayList<Senz>();
-        // Get senzes which service returned, and they are remembered as "key" by SenzManager in mLastSeen.
-        // And log the current time as "value" in mLastSeen.
-        for (Senz senz : senzes)
-            this.mLastSeen.put(senz, now);
-        //L.i("[SenzManager] Senzes LastSeen count:" + mLastSeen.size());
-        // Check every senzes in mLastSeen,
-        // If someone's timestamp is over 20s, then it will be added in unseen.
-        // These senzes in unseen stand for those left senzes.
-        for (Entry<Senz, Long> entry : this.mLastSeen.entrySet())
-            if (entry.getValue() - now > TimeUnit.SECONDS.toMillis(20))
-                unseens.add(entry.getKey());
-        // Remove all left senzes in mLastSeen.
-        for (Senz senz : unseens)
-            this.mLastSeen.remove(senz);
-        // Call the callback which defined by users.
-        //if(unseens.size() > 0) {
-        //    this.mTelepathyCallback.onLeave(unseens);
-        //}
-    }*/
 }

@@ -202,6 +202,7 @@ public class SenzService extends Service {
         // Sensor
         this.mSensorInfo = new SensorInfo(this,this.mSensorHandler);
 
+        askUserStaticInfo();
         // Writer
         //this.gyroWriter = new Writer("gyro.txt");
         //this.acceWriter = new Writer("acce.txt");

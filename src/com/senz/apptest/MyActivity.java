@@ -18,10 +18,7 @@ import java.util.List;
 
 import android.os.RemoteException;
 import android.util.Log;
-import com.senz.core.SenzManager;
-import com.senz.core.Senz;
-import com.senz.core.POI;
-import com.senz.core.TOI;
+import com.senz.core.*;
 
 public class MyActivity extends Activity {
 
@@ -59,6 +56,11 @@ public class MyActivity extends Activity {
                 public void discoverTOI(TOI toi) {
                     Log.i(TAG,"Discover a new TOI!");
                     Log.i(TAG,"POI: while -> " + toi._while + "   when -> " + toi._when);
+                }
+                @Override
+                public void discoverStaticInfo(StaticInfo staticInfo) {
+                    Log.i(TAG,"Discover a new Static Info!");
+                    Log.i(TAG,"User's gender is " + staticInfo.getGender());
                 }
             });
         }

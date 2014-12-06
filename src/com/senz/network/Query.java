@@ -109,7 +109,7 @@ public class Query {
 
             @Override
             public void onError(Exception e) {
-                L.e("query beacons error");
+                L.e("query basic info error");
                 eh.onError(e);
             }
         });
